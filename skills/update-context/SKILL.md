@@ -1,9 +1,9 @@
 ---
 name: update-context
-description: Capture conversation context and create/update markdown documentation organized by feature or bug type. Use when documenting architectural decisions, bug analysis, feature implementations, or design discussions.
-argument-hint: [context-type] [optional-name]
+description: "Capture conversation context and create/update markdown documentation organized by feature or bug type. Use when documenting architectural decisions, bug analysis, feature implementations, or design discussions."
+argument-hint: "[context-type] [optional-name]"
 disable-model-invocation: false
-allowed-tools: Write, Read, Glob, Bash, Edit
+allowed-tools: "Write, Read, Glob, Bash, Edit"
 ---
 
 # Update Context Skill
