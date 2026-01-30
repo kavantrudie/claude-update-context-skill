@@ -8,7 +8,7 @@ A global Claude Code skill for maintaining persistent context documentation acro
 
 ```bash
 # Install using the Vercel skills CLI
-npx skills add https://github.com/kavantrudie/claude-update-context-skill
+npx skills add https://github.com/kavantrudie/skills
 ```
 
 This will install the skill globally for all AI coding agents that support the skills format.
@@ -17,10 +17,10 @@ This will install the skill globally for all AI coding agents that support the s
 
 ```bash
 # Clone into your global Claude skills directory
-git clone https://github.com/kavantrudie/claude-update-context-skill.git ~/.claude/skills/update-context
+git clone https://github.com/kavantrudie/skills.git ~/.claude/skills/update-context
 
 # Or for project-specific installation
-git clone https://github.com/kavantrudie/claude-update-context-skill.git ./.claude/skills/update-context
+git clone https://github.com/kavantrudie/skills.git ./.claude/skills/update-context
 ```
 
 After installation, restart Claude Code CLI to load the skill.
@@ -126,11 +126,12 @@ Claude: "Great! Let me document this architectural decision..."
 ## File Structure
 
 ```
-claude-update-context-skill/
-├── README.md             # This file (for you!)
+skills/
+├── README.md             # Repository overview
 ├── LICENSE               # MIT License
 └── skills/
     └── update-context/
+        ├── README.md             # This file (for you!)
         ├── SKILL.md              # Main skill instructions (Claude reads this)
         ├── template.md           # Full documentation template
         └── examples/
@@ -188,7 +189,7 @@ While built for Claude Code, these markdown files work with:
 This skill is compatible with [skills.sh](https://skills.sh) and can be installed using:
 
 ```bash
-npx skills add https://github.com/kavantrudie/claude-update-context-skill
+npx skills add https://github.com/kavantrudie/skills
 ```
 
 The skill is automatically discoverable on skills.sh once published to GitHub, as it follows the standard skills directory structure with:
@@ -228,7 +229,7 @@ Submit issues or pull requests on GitHub.
 
 ## Support
 
-- **GitHub Repository**: https://github.com/kavantrudie/claude-update-context-skill
+- **GitHub Repository**: https://github.com/kavantrudie/skills
 - **Claude Code Issues**: https://github.com/anthropics/claude-code/issues
 - **Skill Documentation**: See `skills/update-context/SKILL.md`
 - **Template Reference**: See `skills/update-context/template.md`

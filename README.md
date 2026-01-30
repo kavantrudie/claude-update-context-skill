@@ -12,17 +12,17 @@ Skills are modular extensions that enhance AI coding agents with specialized cap
 
 ```bash
 # Install all skills from this repository
-npx skills add https://github.com/kavantrudie/claude-update-context-skill
+npx skills add https://github.com/kavantrudie/skills
 ```
 
 ### Manual Installation (Claude Code)
 
 ```bash
 # Clone into your global Claude skills directory
-git clone https://github.com/kavantrudie/claude-update-context-skill.git ~/.claude/skills/custom
+git clone https://github.com/kavantrudie/skills.git ~/.claude/skills/custom
 
 # Or for project-specific installation
-git clone https://github.com/kavantrudie/claude-update-context-skill.git ./.claude/skills/custom
+git clone https://github.com/kavantrudie/skills.git ./.claude/skills/custom
 ```
 
 ## Available Skills

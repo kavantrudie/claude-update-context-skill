@@ -42,7 +42,7 @@ Skills are automatically loaded when placed in:
 ### With Vercel Skills CLI
 
 ```bash
-npx skills add https://github.com/kavantrudie/claude-update-context-skill
+npx skills add https://github.com/kavantrudie/skills
 ```
 
 The CLI will install all skills from this repository.
