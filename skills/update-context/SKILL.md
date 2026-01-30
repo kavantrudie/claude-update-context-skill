@@ -48,10 +48,18 @@ During technical conversations, I may proactively use this skill to capture impo
 
 ## Documentation Structure
 
-Documentation is organized in the project's `.claude/context-docs/` directory:
+Documentation is organized in the project's context directory. The skill automatically detects your AI coding agent and uses the appropriate directory:
+
+- **Claude Code**: `.claude/context-docs/`
+- **Cursor**: `.cursor/context-docs/`
+- **Aider**: `.aider/context-docs/`
+- **GitHub Copilot**: `.github/copilot/context-docs/`
+- **Generic/Unknown**: `.ai-context/`
+
+You can also specify a custom directory using the `--output` flag.
 
 ```
-.claude/context-docs/
+<context-dir>/
 ├── features/
 │   └── [feature-name].md
 ├── bugs/
@@ -134,30 +142,78 @@ The skill intelligently combines:
 
 See [template.md](template.md) for the full detailed template.
 
+## Agent Detection & Configuration
+
+The skill automatically detects your AI coding agent and creates documentation in the appropriate location:
+
+### Auto-Detection Process
+
+The skill checks for the following in order:
+
+1. **Custom output flag**: `--output /path/to/docs` (highest priority)
+2. **Environment variable**: `AI_CONTEXT_DIR` environment variable
+3. **Agent-specific directories**:
+   - `.claude/` exists → use `.claude/context-docs/`
+   - `.cursor/` exists → use `.cursor/context-docs/`
+   - `.aider/` exists → use `.aider/context-docs/`
+   - `.github/copilot/` exists → use `.github/copilot/context-docs/`
+4. **Generic fallback**: `.ai-context/` (works with any agent)
+
+### Custom Output Directory
+
+```bash
+# Use a custom directory for documentation
+/update-context feature my-feature --output ./docs/ai-context
+
+# Use environment variable (set in your shell config)
+export AI_CONTEXT_DIR=".ai-docs"
+/update-context feature my-feature
+```
+
+### Multi-Agent Projects
+
+If you work with multiple AI agents on the same project, the skill will create separate context directories for each agent. This allows each agent to maintain its own context while keeping documentation organized.
+
+Alternatively, set `AI_CONTEXT_DIR` to use a shared directory across all agents:
+
+```bash
+export AI_CONTEXT_DIR=".ai-context"
+```
+
 ## Implementation Steps
 
 When this skill is invoked, I will:
 
-1. **Parse arguments**: Extract context type ($0) and optional name ($1)
-2. **Check git changes**: Run `git status` to see if there are any changes
-3. **Ask user preference**: If changes exist, ask whether to analyze:
+1. **Parse arguments**: Extract context type ($0), optional name ($1), and optional flags (e.g., `--output`)
+2. **Detect AI agent and determine output directory**:
+   - Check for `--output` flag for custom directory
+   - If not specified, auto-detect the AI agent:
+     - Check for `.claude/` directory → use `.claude/context-docs/`
+     - Check for `.cursor/` directory → use `.cursor/context-docs/`
+     - Check for `.aider/` directory → use `.aider/context-docs/`
+     - Check for `.github/copilot/` directory → use `.github/copilot/context-docs/`
+     - Check environment variable `AI_CONTEXT_DIR` → use that value
+     - Fallback to `.ai-context/` (generic, agent-agnostic)
+   - Store the determined directory path for use in all subsequent steps
+3. **Check git changes**: Run `git status` to see if there are any changes
+4. **Ask user preference**: If changes exist, ask whether to analyze:
    - **Staged changes only** (`git diff --cached`) - cleaner, focused on what's ready to commit
    - **All changes** (`git diff HEAD`) - includes both staged and unstaged changes
    - **Skip git analysis** - use conversation context only
-4. **Analyze git changes**: If user wants git analysis, run the appropriate git diff command and analyze:
+5. **Analyze git changes**: If user wants git analysis, run the appropriate git diff command and analyze:
    - Files modified
    - Nature of changes (added features, bug fixes, refactors)
    - Key code changes and patterns
-5. **Ensure directory exists**: Create `.claude/context-docs/[type]/` if needed
-6. **Generate filename**: Use provided name or derive from conversation/git changes
-7. **Check for existing file**: Read existing content if updating
-8. **Capture context**: Extract relevant information from:
+6. **Ensure directory exists**: Create `<detected-context-dir>/[type]/` if needed (e.g., `.cursor/context-docs/features/`)
+7. **Generate filename**: Use provided name or derive from conversation/git changes
+8. **Check for existing file**: Read existing content if updating
+9. **Capture context**: Extract relevant information from:
    - Conversation history
    - Git diff analysis (if available)
    - File changes and patterns
-9. **Structure content**: Use template format for consistency, integrating both conversation and code change insights
-10. **Write/update file**: Save to appropriate location
-11. **Confirm**: Report back with file path and summary
+10. **Structure content**: Use template format for consistency, integrating both conversation and code change insights
+11. **Write/update file**: Save to appropriate location
+12. **Confirm**: Report back with file path and summary (mention which agent directory was used)
 
 ## Git Changes Analysis
 
@@ -185,6 +241,9 @@ This dual-context approach ensures documentation is both accurate (based on actu
 - **$1** (optional): Name/identifier for the documentation file
   - If not provided, I'll derive a name from the conversation context
   - Examples: `shopping-cart`, `issue-123`, `auth-redesign`
+- **--output** (optional): Custom output directory path
+  - Example: `--output ./docs/context` or `--output .custom/ai-docs`
+  - Overrides auto-detection
 
 If no arguments are provided, I'll ask you what type of context to document.
 
@@ -195,12 +254,13 @@ If no arguments are provided, I'll ask you what type of context to document.
 /update-context feature data-grid-qis
 ```
 I will:
-1. Check git status (finds uncommitted changes)
-2. Ask: "Would you like me to analyze: (1) Staged changes only, (2) All changes, or (3) Skip git analysis?"
-3. User selects "Staged changes only"
-4. Run `git diff --cached` and analyze the actual code changes
-5. Combine conversation context + git analysis
-6. Create: `.claude/context-docs/features/data-grid-qis.md` with detailed implementation info
+1. Detect AI agent (e.g., finds `.cursor/` directory → will use `.cursor/context-docs/`)
+2. Check git status (finds uncommitted changes)
+3. Ask: "Would you like me to analyze: (1) Staged changes only, (2) All changes, or (3) Skip git analysis?"
+4. User selects "Staged changes only"
+5. Run `git diff --cached` and analyze the actual code changes
+6. Combine conversation context + git analysis
+7. Create: `.cursor/context-docs/features/data-grid-qis.md` with detailed implementation info
 
 ### Example 2: Document a Bug Fix
 ```
@@ -215,8 +275,8 @@ With git changes, the documentation will include:
 ```
 /update-context architecture websocket-communication
 ```
-Creates: `.claude/context-docs/architecture/websocket-communication.md`
-Includes discussion of alternatives + actual implementation patterns from code changes
+Auto-detects agent directory and creates documentation (e.g., `.aider/context-docs/architecture/websocket-communication.md` for Aider).
+Includes discussion of alternatives + actual implementation patterns from code changes.
 
 ### Example 4: Update Existing Documentation
 If the file already exists, I'll read it first and merge/update the content with new information from the conversation and any new git changes.
@@ -227,6 +287,23 @@ If the file already exists, I'll read it first and merge/update the content with
 ```
 If no git changes exist yet, or user selects "Skip git analysis", documentation will be based purely on conversation context - perfect for planning and design discussions.
 
+### Example 6: Custom Output Directory
+```
+/update-context refactor code-cleanup --output ./team-docs/ai-context
+```
+Creates: `./team-docs/ai-context/refactors/code-cleanup.md`
+Useful for shared team documentation or custom project structures.
+
+### Example 7: Multi-Agent Project
+In a project using both Claude and Cursor:
+- Claude: Creates docs in `.claude/context-docs/`
+- Cursor: Creates docs in `.cursor/context-docs/`
+
+Each agent maintains its own context history. To share context across agents, set:
+```bash
+export AI_CONTEXT_DIR=".shared-context"
+```
+
 ## Tips
 
 - **Use descriptive names**: Choose clear, searchable names for your documentation
@@ -236,8 +313,11 @@ If no git changes exist yet, or user selects "Skip git analysis", documentation 
 - **Use all changes for sessions**: When documenting a full work session with multiple changes, use "all changes"
 - **Review later**: These docs serve as great onboarding material and decision logs
 - **Update when needed**: Re-run the skill with the same name to append new findings
-- **Commit to git**: Include `.claude/context-docs/` in your repository for team visibility
+- **Commit to git**: Include your context directory (e.g., `.claude/context-docs/` or `.ai-context/`) in your repository for team visibility
 - **Works with or without git**: The skill adapts - use it for planning (no git) or post-implementation (with git)
+- **Share across agents**: Set `AI_CONTEXT_DIR` environment variable to use a shared context directory for multiple AI agents
+- **Custom locations**: Use `--output` flag to specify exactly where documentation should be saved
+- **Multi-agent workflows**: Each agent can maintain its own context, or share a common directory - your choice!
 
 ## Integration with Development Workflow
 

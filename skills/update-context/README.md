@@ -1,6 +1,6 @@
 # Update Context Skill
 
-A global Claude Code skill for maintaining persistent context documentation across all your projects. Combines conversation insights with actual git changes to create comprehensive, accurate documentation.
+A universal AI coding skill for maintaining persistent context documentation across all your projects and agents. Works with Claude Code, Cursor, Aider, GitHub Copilot, and any AI coding agent. Combines conversation insights with actual git changes to create comprehensive, accurate documentation.
 
 ## Installation
 
@@ -13,17 +13,42 @@ npx skills add https://github.com/kavantrudie/skills
 
 This will install the skill globally for all AI coding agents that support the skills format.
 
-### Option 2: Manual Installation (Claude Code)
+### Option 2: Manual Installation
 
+#### For Claude Code
 ```bash
-# Clone into your global Claude skills directory
+# Global installation
 git clone https://github.com/kavantrudie/skills.git ~/.claude/skills/update-context
 
-# Or for project-specific installation
+# Project-specific installation
 git clone https://github.com/kavantrudie/skills.git ./.claude/skills/update-context
 ```
 
-After installation, restart Claude Code CLI to load the skill.
+#### For Cursor
+```bash
+# Global installation
+git clone https://github.com/kavantrudie/skills.git ~/.cursor/skills/update-context
+
+# Project-specific installation
+git clone https://github.com/kavantrudie/skills.git ./.cursor/skills/update-context
+```
+
+#### For Aider
+```bash
+# Global installation
+git clone https://github.com/kavantrudie/skills.git ~/.aider/skills/update-context
+
+# Project-specific installation
+git clone https://github.com/kavantrudie/skills.git ./.aider/skills/update-context
+```
+
+#### For Other Agents
+```bash
+# Use a generic location
+git clone https://github.com/kavantrudie/skills.git ~/.ai-skills/update-context
+```
+
+After installation, restart your AI coding agent to load the skill.
 
 ## Quick Start
 
@@ -49,7 +74,7 @@ Just mention it in conversation:
 "Document this bug fix for future reference"
 ```
 
-Claude will automatically invoke the skill and create organized documentation.
+Your AI agent will automatically invoke the skill and create organized documentation.
 
 ## What It Does
 
@@ -60,11 +85,20 @@ This skill combines two powerful sources of information:
 
 Together, they create comprehensive documentation that's both meaningful and accurate.
 
-The skill creates structured markdown documentation in your project's `.claude/context-docs/` directory:
+The skill **automatically detects your AI agent** and creates documentation in the appropriate directory:
 
+**Agent Detection:**
+- Claude Code → `.claude/context-docs/`
+- Cursor → `.cursor/context-docs/`
+- Aider → `.aider/context-docs/`
+- GitHub Copilot → `.github/copilot/context-docs/`
+- Generic/Unknown → `.ai-context/`
+- Custom → Use `--output` flag or set `AI_CONTEXT_DIR` environment variable
+
+**Directory Structure (example for Cursor):**
 ```
 your-project/
-└── .claude/
+└── .cursor/
     └── context-docs/
         ├── features/
         │   └── my-feature.md
@@ -142,15 +176,16 @@ Each documentation file includes insights from **conversation + git analysis**:
 ```
 
 **What happens:**
-1. Claude detects you have uncommitted changes
-2. Prompts: "Would you like me to analyze: (1) Staged changes only, (2) All changes, or (3) Skip git analysis?"
-3. You select "Staged changes only"
-4. Claude runs `git diff --cached` and analyzes:
+1. Agent detects you're using Cursor (finds `.cursor/` directory)
+2. Detects you have uncommitted changes
+3. Prompts: "Would you like me to analyze: (1) Staged changes only, (2) All changes, or (3) Skip git analysis?"
+4. You select "Staged changes only"
+5. Agent runs `git diff --cached` and analyzes:
    - Modified: `DataGrid.tsx` (+87 / -34)
    - Modified: `hooks/useDataGrid.ts` (+45 / -12)
    - Added: `DataGrid.test.tsx` (+120 / -0)
    - Modified: `package.json` (+1 / -0)
-5. Creates: `.claude/context-docs/features/data-grid-improvements.md` with:
+6. Creates: `.cursor/context-docs/features/data-grid-improvements.md` with:
    - Your discussed reasoning (from conversation)
    - Exact code changes (from git diff)
    - New dependencies (react-window for virtualization)
@@ -169,11 +204,21 @@ Each documentation file includes insights from **conversation + git analysis**:
 ### Example 3: During Conversation
 ```
 You: "I just implemented WebSocket communication for real-time updates"
-Claude: "Great! Let me document this architectural decision..."
-Claude: "I see you have changes. Would you like me to analyze staged changes, all changes, or skip git analysis?"
+Agent: "Great! Let me document this architectural decision..."
+Agent: "I see you have changes. Would you like me to analyze staged changes, all changes, or skip git analysis?"
 You: "All changes"
-Claude: [Analyzes git diff showing WebSocket setup, connection handling, reconnection logic]
-[Creates .claude/context-docs/architecture/websocket-communication.md with both discussion and code details]
+Agent: [Analyzes git diff showing WebSocket setup, connection handling, reconnection logic]
+[Creates documentation in your agent's context directory with both discussion and code details]
+```
+
+### Example 5: Custom Output Directory
+```bash
+# Use a custom directory for your team's documentation
+/update-context feature new-api --output ./team-docs/ai-context
+
+# Or set environment variable for all invocations
+export AI_CONTEXT_DIR=".shared-context"
+/update-context feature new-api
 ```
 
 ### Example 4: Planning Without Git (No Changes Yet)
@@ -193,9 +238,11 @@ If no git changes exist (planning phase), documentation is based purely on conve
    - **All changes**: When documenting a full work session
    - **Skip git analysis**: When planning or discussing future work
 5. **Update when needed**: Re-run with the same name to update existing docs with new changes
-6. **Commit to git**: Include `.claude/context-docs/` in your repository
+6. **Commit to git**: Include your context directory in your repository (e.g., `.cursor/context-docs/` or `.ai-context/`)
 7. **Share with team**: These docs become great onboarding material with actual code evidence
-8. **Works everywhere**: Use with Claude Code, Cursor, or implement manually - the skill works the same
+8. **Works with any agent**: Use with Claude Code, Cursor, Aider, GitHub Copilot, or any AI coding agent
+9. **Custom directories**: Use `--output` flag or `AI_CONTEXT_DIR` environment variable for custom locations
+10. **Multi-agent projects**: Each agent maintains its own context directory, or share one with `AI_CONTEXT_DIR`
 
 ## File Structure
 
@@ -225,9 +272,26 @@ skills/
 
 ## Customization
 
-Want to customize the template? Edit:
+Want to customize the template? Edit the template file in your agent's skills directory:
+
+**Claude Code:**
 ```
 ~/.claude/skills/update-context/skills/update-context/template.md
+```
+
+**Cursor:**
+```
+~/.cursor/skills/update-context/skills/update-context/template.md
+```
+
+**Aider:**
+```
+~/.aider/skills/update-context/skills/update-context/template.md
+```
+
+**Generic:**
+```
+~/.ai-skills/update-context/skills/update-context/template.md
 ```
 
 Or if you cloned the repository directly, edit `skills/update-context/template.md` in your clone.
@@ -253,13 +317,26 @@ Perfect for these workflows:
    - After decision → Document rationale and tradeoffs
    - Post-implementation → Update with lessons learned
 
-## Multi-Tool Compatibility
+## Multi-Agent Compatibility
 
-While built for Claude Code, these markdown files work with:
-- **Cursor**: Read docs for context in future sessions
-- **VS Code Copilot**: Reference docs in comments
-- **GitHub Copilot**: Docs provide codebase context
-- **Manual reference**: Human-readable documentation
+This skill works natively with multiple AI coding agents:
+
+**Fully Supported (Auto-Detection):**
+- **Claude Code** - Auto-detects `.claude/` directory
+- **Cursor** - Auto-detects `.cursor/` directory
+- **Aider** - Auto-detects `.aider/` directory
+- **GitHub Copilot** - Auto-detects `.github/copilot/` directory
+
+**Generic Support:**
+- Any AI agent - Falls back to `.ai-context/` directory
+- Custom configuration - Use `--output` flag or `AI_CONTEXT_DIR` variable
+
+**Documentation Sharing:**
+The generated markdown files can be read by:
+- All AI coding agents for context in future sessions
+- Team members for onboarding and reference
+- Documentation tools for knowledge bases
+- Version control for change tracking
 
 ## Available on skills.sh
 
@@ -280,18 +357,44 @@ Users can also install directly from this GitHub repository using the manual ins
 ## Troubleshooting
 
 ### Skill not appearing?
-1. Verify file exists: `ls ~/.claude/skills/update-context/SKILL.md`
-2. Restart Claude Code CLI
+1. Verify file exists in your agent's skills directory:
+   - Claude Code: `ls ~/.claude/skills/update-context/SKILL.md`
+   - Cursor: `ls ~/.cursor/skills/update-context/SKILL.md`
+   - Aider: `ls ~/.aider/skills/update-context/SKILL.md`
+2. Restart your AI coding agent
 3. Try manual invocation: `/update-context feature test`
 
 ### Context directory not created?
-The skill creates `.claude/context-docs/` in your **project root** (not global).
-Navigate to your project directory first.
+The skill creates the context directory in your **project root** (not global).
+Navigate to your project directory first. Check which directory was used with:
+- Claude Code: `.claude/context-docs/`
+- Cursor: `.cursor/context-docs/`
+- Aider: `.aider/context-docs/`
+- GitHub Copilot: `.github/copilot/context-docs/`
+- Generic: `.ai-context/`
 
-### Want project-specific skill instead?
-Copy this skill to your project:
+### Want a custom directory?
+Use the `--output` flag or set the `AI_CONTEXT_DIR` environment variable:
 ```bash
+# Using flag
+/update-context feature test --output ./my-docs
+
+# Using environment variable
+export AI_CONTEXT_DIR="./team-context"
+/update-context feature test
+```
+
+### Want project-specific skill installation?
+Copy this skill to your project (adjust path for your agent):
+```bash
+# For Claude Code
 cp -r ~/.claude/skills/update-context ./.claude/skills/
+
+# For Cursor
+cp -r ~/.cursor/skills/update-context ./.cursor/skills/
+
+# For Aider
+cp -r ~/.aider/skills/update-context ./.aider/skills/
 ```
 
 ## Contributing

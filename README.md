@@ -31,13 +31,22 @@ See the [skills directory](./skills/) for all available skills in this collectio
 
 ### Update Context
 
-A skill for maintaining persistent context documentation across all your projects. Combines conversation insights with git diff analysis to create comprehensive, accurate documentation of features, bugs, and architectural decisions.
+A universal skill for maintaining persistent context documentation across all your projects and AI coding agents. Combines conversation insights with git diff analysis to create comprehensive, accurate documentation of features, bugs, and architectural decisions.
 
 **Key Features:**
-- Analyzes both conversation context and actual git changes
-- Supports staged changes, all changes, or conversation-only modes
-- Automatically extracts code details, dependencies, and test coverage
-- Creates organized markdown docs in `.claude/context-docs/`
+- **Multi-agent support**: Works with Claude Code, Cursor, Aider, GitHub Copilot, and any AI coding agent
+- **Auto-detection**: Automatically detects your agent and uses the appropriate directory
+- **Flexible output**: Custom directories via `--output` flag or `AI_CONTEXT_DIR` environment variable
+- **Git analysis**: Analyzes staged changes, all changes, or conversation-only modes
+- **Comprehensive**: Automatically extracts code details, dependencies, and test coverage
+- **Organized**: Creates structured markdown docs with consistent templates
+
+**Supported Agents:**
+- Claude Code → `.claude/context-docs/`
+- Cursor → `.cursor/context-docs/`
+- Aider → `.aider/context-docs/`
+- GitHub Copilot → `.github/copilot/context-docs/`
+- Generic/Unknown → `.ai-context/`
 
 [Learn more about update-context →](./skills/update-context/)
 
@@ -82,9 +91,14 @@ allowed-tools: Write, Read, Glob, Bash, Edit
 ## Compatibility
 
 These skills are compatible with:
-- Claude Code CLI
-- Vercel AI agents (via skills.sh)
-- Any AI coding agent that supports the skills.sh format
+- **Claude Code** - Full native support with auto-detection
+- **Cursor** - Auto-detects and creates docs in `.cursor/context-docs/`
+- **Aider** - Auto-detects and creates docs in `.aider/context-docs/`
+- **GitHub Copilot** - Auto-detects and creates docs in `.github/copilot/context-docs/`
+- **Vercel AI agents** - Via skills.sh format
+- **Any AI coding agent** - Falls back to `.ai-context/` directory or use custom `--output` flag
+
+All skills automatically adapt to your agent and workflow!
 
 ## Contributing
 
